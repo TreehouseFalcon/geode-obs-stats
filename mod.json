@@ -1,0 +1,37 @@
+{
+	"geode": "5.7.1",
+	"gd": {
+		"win": "2.2081",
+		"mac": "2.2081"
+	},
+	"id": "treehousefalcon.obs-stats",
+	"name": "OBS Stats",
+	"developer": "TreehouseFalcon",
+	"version": "v0.0.1",
+	"description": "Automatically show stats in OBS",
+	"tags": [
+		"customization",
+		"enhancement",
+		"utility"
+	],
+	"links": {
+		"source": "https://github.com/TreehouseFalcon/geode-obs-stats"
+	},
+	"issues": {
+		"info": "Report issues via GitHub Issues",
+		"url": "https://github.com/TreehouseFalcon/geode-obs-stats/issues"
+	},
+	"settings": {
+		"obs-ws-password": {
+			"type": "custom:obs-ws-password",
+			"name": "OBS Websocket Password",
+			"description": "The websocket password you've assigned in OBS"
+		},
+		"source-mappings": {
+			"type": "custom:source-mappings",
+			"name": "Source Mappings",
+			"description": "Control mappings between Geometry Dash stats and OBS sources"
+		}
+	},
+	"dependencies": {}
+}
