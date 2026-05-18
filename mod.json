@@ -8,7 +8,7 @@
 	"name": "OBS Stats",
 	"developer": "TreehouseFalcon",
 	"version": "v0.0.1",
-	"description": "Automatically show stats in OBS",
+	"description": "Automatically show Geometry Dash stats on OBS",
 	"tags": [
 		"customization",
 		"enhancement",
