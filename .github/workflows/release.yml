@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - uses: hiimjasmine00/release-geode-mod@main
         with:
@@ -30,6 +32,8 @@ jobs:
     needs: ["release"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - uses: hiimjasmine00/release-geode-mod/publish@main
         with:
