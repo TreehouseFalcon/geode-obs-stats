@@ -25,7 +25,7 @@
 		"obs-ws-password": {
 			"type": "custom:obs-ws-password",
 			"name": "obs websocket password",
-			"description": "The websocket password you've assigned in OBS"
+			"description": "The websocket password you've set in OBS"
 		},
 		"source-mappings": {
 			"type": "custom:source-mappings",
@@ -35,7 +35,7 @@
 		"leaderboard-rank-refresh-interval": {
 			"type": "int",
 			"name": "leaderboard refresh interval",
-			"description": "How often to refresh leaderboard rank placeholders, in minutes",
+			"description": "How often to refresh leaderboard rank, in minutes",
 			"default": 10,
 			"min": 5,
 			"max": 30

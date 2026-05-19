@@ -10,6 +10,12 @@ If you encounter any issues with this mod, report them in the [Issues](https://g
 
 If you feel like contributing to this mod, please let me know on Discord! You can find me in the [Geode Discord](https://discord.gg/9e43WMKzhp). I am open to any contributions, whether it's code, design, or just suggestions for new features.
 
+### Planned features
+
+- [ ] `{CREATOR_POINTS}` placeholder
+- [ ] Support for [EclipseMenu/rift](https://github.com/eclipsemenu/rift) to support more complex formats including math and level-specific stats
+- [ ] `{ATTEMPTS}` and `{JUMPS}` placeholders for current level (integrated with [Attempt Link](https://geode-sdk.org/mods/zilko.attempt_link))
+
 ## Getting started
 
 To clone this repository properly, you'll need to include the `IXWebSocket` submodule. You can do this by including submodules in your clone operation:
