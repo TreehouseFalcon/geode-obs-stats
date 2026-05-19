@@ -7,8 +7,8 @@
 	"id": "treehousefalcon.obs-stats",
 	"name": "OBS Stats",
 	"developer": "TreehouseFalcon",
-	"version": "v0.0.1",
-	"description": "Automatically show Geometry Dash stats on OBS",
+	"version": "v0.1.0",
+	"description": "Sync your Geometry Dash stats with OBS",
 	"tags": [
 		"customization",
 		"enhancement",
@@ -24,13 +24,21 @@
 	"settings": {
 		"obs-ws-password": {
 			"type": "custom:obs-ws-password",
-			"name": "OBS Websocket Password",
+			"name": "obs websocket password",
 			"description": "The websocket password you've assigned in OBS"
 		},
 		"source-mappings": {
 			"type": "custom:source-mappings",
-			"name": "Source Mappings",
+			"name": "source mappings",
 			"description": "Control mappings between Geometry Dash stats and OBS sources"
+		},
+		"leaderboard-rank-refresh-interval": {
+			"type": "int",
+			"name": "leaderboard refresh interval",
+			"description": "How often to refresh leaderboard rank placeholders, in minutes",
+			"default": 10,
+			"min": 5,
+			"max": 30
 		}
 	},
 	"dependencies": {}

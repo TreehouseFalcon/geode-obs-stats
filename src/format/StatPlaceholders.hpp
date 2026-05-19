@@ -17,6 +17,7 @@ namespace obs_stats {
     enum class SelectStrategy {
         GameStatManagerKey,
         CompletedDifficulty,
+        LeaderboardRank,
     };
 
     struct GameStatManagerKeySelection {
@@ -27,9 +28,14 @@ namespace obs_stats {
         GJDifficulty difficulty;
     };
 
+    struct LeaderboardRankSelection {
+        LeaderboardStat leaderboardStat;
+    };
+
     using PlaceholderSelection = std::variant<
         GameStatManagerKeySelection,
-        CompletedDifficultySelection
+        CompletedDifficultySelection,
+        LeaderboardRankSelection
     >;
 
     struct StatPlaceholder {
@@ -39,6 +45,7 @@ namespace obs_stats {
 
     SelectStrategy selectStrategy(StatPlaceholder const& placeholder);
     std::optional<std::string> selectStatPlaceholderValue(StatPlaceholder const& placeholder);
+    std::optional<int> leaderboardRankForStat(LeaderboardStat stat);
     std::span<StatPlaceholder const> statPlaceholders();
     std::optional<StatPlaceholder> findStatPlaceholder(std::string_view placeholder);
     std::optional<StatPlaceholder> findStatPlaceholder(

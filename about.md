@@ -10,7 +10,8 @@ To link this mod with your OBS, follow these steps:
 2. Open "Tools" from the top left menubar and select "WebSocket Server Settings"
 3. Check the box that says "Enable WebSocket server"
 4. Set a "Server Password" (or click Generate Password)
-  - note: this step is very important or else malicious applications on your computer can control anything on OBS
+
+- note: this step is very important or else malicious applications on your computer can control anything on OBS
 
 ---
 
@@ -47,9 +48,9 @@ Below you can find the full list of stats you can display. Placing any of the fo
 - `{COMPLETED_INSANE_DEMONS}`: Number of completed Insane Demon levels
 - `{COMPLETED_EXTREME_DEMONS}`: Number of completed Extreme Demon levels
 
-### Leaderboard stats
+### Global rank stats
 
-- `{STARS_LEADERBOARD_RANK}`: Your rank on the stars leaderboard
-- `{MOONS_LEADERBOARD_RANK}`: Your rank on the moons leaderboard
-- `{DEMONS_LEADERBOARD_RANK}`: Your rank on the demons leaderboard
-- `{USER_COINS_LEADERBOARD_RANK}`: Your rank on the user coins leaderboard
+- `{STARS_GLOBAL_RANK}`: Your rank on the global stars leaderboard
+- `{MOONS_GLOBAL_RANK}`: Your rank on the global moons leaderboard
+- `{DEMONS_GLOBAL_RANK}`: Your rank on the global demons leaderboard
+- `{USER_COINS_GLOBAL_RANK}`: Your rank on the global user coins leaderboard

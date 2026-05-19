@@ -16,7 +16,7 @@ using namespace geode::prelude;
 
 namespace obs_stats {
     namespace {
-        constexpr std::array<StatPlaceholder, 22> kStatPlaceholders = {{
+        constexpr std::array<StatPlaceholder, 26> kStatPlaceholders = {{
             { .name = "STARS", .selection = GameStatManagerKeySelection { .statKey = StatKey::Stars, }, },
             { .name = "MOONS", .selection = GameStatManagerKeySelection { .statKey = StatKey::Moons, }, },
             { .name = "INSANES", .selection = GameStatManagerKeySelection { .statKey = StatKey::Insanes, }, },
@@ -40,6 +40,11 @@ namespace obs_stats {
             { .name = "COMPLETED_HARD_DEMONS", .selection = CompletedDifficultySelection { .difficulty = GJDifficulty::Demon, }, },
             { .name = "COMPLETED_INSANE_DEMONS", .selection = CompletedDifficultySelection { .difficulty = GJDifficulty::DemonInsane, }, },
             { .name = "COMPLETED_EXTREME_DEMONS", .selection = CompletedDifficultySelection { .difficulty = GJDifficulty::DemonExtreme, }, },
+
+            { .name = "STARS_GLOBAL_RANK", .selection = LeaderboardRankSelection { .leaderboardStat = LeaderboardStat::Stars, }, },
+            { .name = "MOONS_GLOBAL_RANK", .selection = LeaderboardRankSelection { .leaderboardStat = LeaderboardStat::Moons, }, },
+            { .name = "DEMONS_GLOBAL_RANK", .selection = LeaderboardRankSelection { .leaderboardStat = LeaderboardStat::Demons, }, },
+            { .name = "USER_COINS_GLOBAL_RANK", .selection = LeaderboardRankSelection { .leaderboardStat = LeaderboardStat::UserCoins, }, },
         }};
 
         std::string selectGameStatManagerKeyStat(PlaceholderSelection const& selection) {
@@ -76,6 +81,21 @@ namespace obs_stats {
             return formatCommaNumber(*count);
         }
 
+        std::string selectLeaderboardRank(PlaceholderSelection const& selection) {
+            LeaderboardRankSelection const* leaderboardRankSelection =
+                std::get_if<LeaderboardRankSelection>(&selection);
+            if (leaderboardRankSelection == nullptr) {
+                return "...";
+            }
+
+            std::optional<int> rank = leaderboardRankForStat(leaderboardRankSelection->leaderboardStat);
+            if (!rank || *rank <= 0) {
+                return "...";
+            }
+
+            return formatCommaNumber(*rank);
+        }
+
         std::string normalizePlaceholder(std::string_view placeholder) {
             if (placeholder.size() >= 2 && placeholder.front() == '{' && placeholder.back() == '}') {
                 placeholder.remove_prefix(1);
@@ -104,6 +124,9 @@ namespace obs_stats {
                 else if constexpr (std::is_same_v<Selection, CompletedDifficultySelection>) {
                     return SelectStrategy::CompletedDifficulty;
                 }
+                else if constexpr (std::is_same_v<Selection, LeaderboardRankSelection>) {
+                    return SelectStrategy::LeaderboardRank;
+                }
             }, selection);
         }
     }
@@ -118,6 +141,8 @@ namespace obs_stats {
                 return selectGameStatManagerKeyStat(placeholder.selection);
             case SelectStrategy::CompletedDifficulty:
                 return selectCompletedDifficulty(placeholder.selection);
+            case SelectStrategy::LeaderboardRank:
+                return selectLeaderboardRank(placeholder.selection);
         }
 
         return std::nullopt;
