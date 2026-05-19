@@ -167,13 +167,18 @@ namespace obs {
         std::mutex callbackMutex;
         std::mutex requestCallbackMutex;
         std::map<std::string, RequestCallback> requestCallbacks;
+        std::atomic_bool shuttingDown = false;
         bool networkInitialized = false;
 
         ~Impl() {
-            disconnect();
+            shutdown();
         }
 
         void connect(ConnectionOptions nextOptions) {
+            if (shuttingDown.load()) {
+                return;
+            }
+
             disconnect();
 
             options = std::move(nextOptions);
@@ -198,16 +203,39 @@ namespace obs {
             webSocket.start();
         }
 
-        void disconnect() {
+        void disconnect(bool notify = true) {
             webSocket.stop();
             webSocket.setOnMessageCallback(nullptr);
+
+            {
+                std::lock_guard lock(requestCallbackMutex);
+                requestCallbacks.clear();
+            }
 
             if (networkInitialized) {
                 (void)ix::uninitNetSystem();
                 networkInitialized = false;
             }
 
-            setState(ConnectionState::Disconnected);
+            if (notify && !shuttingDown.load()) {
+                setState(ConnectionState::Disconnected);
+            }
+            else {
+                state.store(ConnectionState::Disconnected);
+            }
+        }
+
+        void shutdown() {
+            if (shuttingDown.exchange(true)) {
+                return;
+            }
+
+            {
+                std::lock_guard lock(callbackMutex);
+                stateCallback = nullptr;
+            }
+
+            disconnect(false);
         }
 
         std::optional<std::string> sendRequest(
@@ -215,6 +243,10 @@ namespace obs {
             matjson::Value requestData,
             RequestCallback callback = nullptr
         ) {
+            if (shuttingDown.load()) {
+                return std::nullopt;
+            }
+
             if (state.load() != ConnectionState::Identified) {
                 log::warn("OBS websocket: tried to send '{}' before identify completed", requestType);
                 return std::nullopt;
@@ -255,6 +287,9 @@ namespace obs {
 
         void setState(ConnectionState nextState) {
             state.store(nextState);
+            if (shuttingDown.load()) {
+                return;
+            }
 
             StateCallback callback;
             {
@@ -268,6 +303,10 @@ namespace obs {
         }
 
         void handleMessage(ix::WebSocketMessagePtr const& message) {
+            if (shuttingDown.load()) {
+                return;
+            }
+
             switch (message->type) {
                 case ix::WebSocketMessageType::Open:
                     log::info("OBS websocket: connected, waiting for Hello");
@@ -423,6 +462,14 @@ namespace obs {
 
     void WebSocketClient::connect(ConnectionOptions options) {
         m_impl->connect(std::move(options));
+    }
+
+    void WebSocketClient::disconnect() {
+        m_impl->disconnect();
+    }
+
+    void WebSocketClient::shutdown() {
+        m_impl->shutdown();
     }
 
     ConnectionState WebSocketClient::getState() const {

@@ -35,6 +35,8 @@ namespace obs {
 
         void setStateCallback(StateCallback callback);
         void connect(ConnectionOptions options = {});
+        void disconnect();
+        void shutdown();
 
         [[nodiscard]] ConnectionState getState() const;
         [[nodiscard]] bool isIdentified() const;

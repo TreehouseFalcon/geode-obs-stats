@@ -27,6 +27,7 @@ namespace {
     std::atomic_bool g_retryEnabled = false;
     std::atomic_bool g_retryScheduled = false;
     std::atomic_bool g_startingConnection = false;
+    std::atomic_bool g_shutdownStarted = false;
     std::atomic_bool g_wasConnected = false;
     std::atomic<std::uint64_t> g_connectionGeneration = 0;
     std::mutex g_passwordMutex;
@@ -68,6 +69,10 @@ namespace {
     }
 
     void tryConnectToObs() {
+        if (g_shutdownStarted.load()) {
+            return;
+        }
+
         obs::ConnectionOptions options = {
             .password = getCurrentPassword(),
         };
@@ -100,7 +105,7 @@ namespace {
     }
 
     void scheduleConnectionRetry() {
-        if (!g_retryEnabled.load() || g_startingConnection.load()) {
+        if (g_shutdownStarted.load() || !g_retryEnabled.load() || g_startingConnection.load()) {
             return;
         }
         if (g_retryScheduled.exchange(true)) {
@@ -113,7 +118,15 @@ namespace {
         std::thread([generation] {
             std::this_thread::sleep_for(RETRY_DELAY);
 
+            if (g_shutdownStarted.load()) {
+                return;
+            }
+
             queueInMainThread([generation] {
+                if (g_shutdownStarted.load()) {
+                    return;
+                }
+
                 if (generation != g_connectionGeneration.load()) {
                     return;
                 }
@@ -133,7 +146,15 @@ namespace {
     }
 
     void showObsNotification(std::string text, NotificationIcon icon, float time = NOTIFICATION_DEFAULT_TIME) {
+        if (g_shutdownStarted.load()) {
+            return;
+        }
+
         queueInMainThread([text = std::move(text), icon, time] {
+            if (g_shutdownStarted.load()) {
+                return;
+            }
+
             Notification::create(fmt::format("obs stats - {}", text), icon, time)->show();
         });
     }
@@ -151,7 +172,15 @@ namespace {
     };
 
     void emitTextSources(obs::TextSourcesCallback callback, std::vector<std::string> sources) {
+        if (g_shutdownStarted.load()) {
+            return;
+        }
+
         queueInMainThread([callback = std::move(callback), sources = std::move(sources)]() mutable {
+            if (g_shutdownStarted.load()) {
+                return;
+            }
+
             if (callback) {
                 callback(std::move(sources));
             }
@@ -296,7 +325,15 @@ namespace obs {
         return client;
     }
 
+    void shutdownClient() {
+        getClient().shutdown();
+    }
+
     void fetchCurrentSceneTextSources(TextSourcesCallback callback) {
+        if (g_shutdownStarted.load()) {
+            return;
+        }
+
         if (!getClient().isIdentified()) {
             log::warn("OBS websocket: cannot fetch text sources before identify completed");
             emitTextSources(std::move(callback), {});
@@ -434,4 +471,10 @@ $on_mod(Loaded) {
 
 $on_game(Loaded) {
     startConnectionRetries(getObsPassword());
+}
+
+$on_game(Exiting) {
+    g_shutdownStarted.store(true);
+    stopConnectionRetries();
+    obs::shutdownClient();
 }

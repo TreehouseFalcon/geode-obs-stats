@@ -11,5 +11,6 @@ namespace obs {
     using TextSourcesCallback = geode::Function<void(std::vector<std::string>)>;
 
     WebSocketClient& getClient();
+    void shutdownClient();
     void fetchCurrentSceneTextSources(TextSourcesCallback callback);
 }
